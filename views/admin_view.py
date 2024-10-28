@@ -4,7 +4,7 @@ from controllers.admin_controller import AdminController
 router = APIRouter()
 admin_controller = AdminController()
 
-@router.post("/admin/register")
+@router.post("/api/admin/register")
 async def register_admin(request: Request):
     """Register a new admin account."""
     data = await request.json()
@@ -21,7 +21,7 @@ async def register_admin(request: Request):
     
     return result
 
-@router.post("/admin/login")
+@router.post("/api/admin/login")
 async def login_admin(request: Request):
     """Log in an admin and return a JWT token."""
     data = await request.json()

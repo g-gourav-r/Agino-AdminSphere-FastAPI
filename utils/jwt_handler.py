@@ -2,6 +2,7 @@ import os
 import jwt
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
+from fastapi import Depends, HTTPException, status, Header
 
 load_dotenv()
 
@@ -17,10 +18,26 @@ def create_access_token(data: dict):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-def verify_access_token(token: str):
-    """Decode and verify a JWT token."""
+def verify_access_token(authorization: str = Header(...)):
+    """Decode and verify a JWT token from the Authorization header."""
+    token_prefix = "Bearer "
+    if not authorization.startswith(token_prefix):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token format. Expected 'Bearer <token>'",
+        )
+    
+    token = authorization[len(token_prefix):]
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload
     except jwt.ExpiredSignatureError:
-        return None
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token expired",
+        )
+    except jwt.InvalidTokenError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token invalid",
+        )
