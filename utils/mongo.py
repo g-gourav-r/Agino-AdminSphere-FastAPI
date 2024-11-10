@@ -15,3 +15,6 @@ db = client[MONGO_DB_NAME]
 
 def get_admin_collection():
     return db["admins"]
+
+def get_customers_collection():
+    return db["users"]
